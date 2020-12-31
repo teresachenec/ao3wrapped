@@ -1,5 +1,7 @@
-username = "Echolight"
-password = "uNW8%r^FUHy0FR2JZCLz"
+from credentials import uname, pword
+
+username = uname
+password = pword
 
 # pip3 install requests
 # pip3 install beautifulsoup4
