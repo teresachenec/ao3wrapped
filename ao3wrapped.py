@@ -49,98 +49,6 @@ def parse_hist_page(soup):
 	try:
 		work_list = soup.find("ol", {"class": "reading work index group"})
 		for w in work_list.find_all("li", {"class": "reading work blurb group"}):
-			# Get title
-			title = w.find("div", {"class": "header module"}).find("h4", {"class": "heading"}).find("a").text
-			if title == title.lower():
-				global title_lower_count
-				title_lower_count += 1
-			# print(title)
-
-			# Get authors
-			authors = []
-			for author in w.find("div", {"class": "header module"}).find("h4", {"class": "heading"}).find_all(rel="author"):
-				if author.text != "orphan_account":
-					authors.append(author.text)
-					if author.text in user_authors:
-						user_authors[author.text] += 1
-					else:
-						user_authors[author.text] = 1
-			# print(authors)
-
-			# Get date last updated
-			updated = w.find("div", {"class": "header module"}).find("p").text
-			# print(updated)
-
-			# Get fandoms
-			fandoms = []
-			for fandom in w.find("div", {"class": "header module"}).find("h5", "fandoms heading").find_all("a"):
-				fandoms.append(fandom.text)
-				if fandom.text in user_fandoms:
-					user_fandoms[fandom.text] += 1
-				else:
-					user_fandoms[fandom.text] = 1
-			# print(fandoms)
-
-			# Get relationship type, rating, and work status
-			req_tag_list = []
-			for req_tag in w.find("div", {"class": "header module"}).find("ul").find_all("li"):
-				req_tag_list.append(req_tag.find("a").find("span", {"class": "text"}).text)
-			ship_types = []
-			for type in req_tag_list[2].split(", "):
-				ship_types.append(type)
-				user_ship_type[type] += 1
-			rating = req_tag_list[0]
-			user_rating[rating] += 1
-			work_status = req_tag_list[3]
-			user_status[work_status] += 1
-			# print(ship_types)
-			# print(rating)
-			# print(work_status)
-
-			# Get relationships
-			ships = []
-			for ship in w.find("ul", {"class": "tags commas"}).find_all("li", {"class": "relationships"}):
-				ships.append(ship.text)
-				if ship.text in user_ships:
-					user_ships[ship.text] += 1
-				else:
-					user_ships[ship.text] = 1
-			# print(ships)
-
-			# Get characters
-			characters = []
-			for character in w.find("ul", {"class": "tags commas"}).find_all("li", {"class": "characters"}):
-				characters.append(character.text)
-				if character.text in user_characters:
-					user_characters[character.text] += 1
-				else:
-					user_characters[character.text] = 1
-			# print(characters)
-
-			# Get freeform tags
-			additional_tags = []
-			for tag in w.find("ul", {"class": "tags commas"}).find_all("li", {"class": "freeforms"}):
-				additional_tags.append(tag.text)
-				if tag.text in user_tags:
-					user_tags[tag.text] += 1
-				else:
-					user_tags[tag.text] = 1
-			# print(additional_tags)
-
-			# Get word count
-			word_count = int(w.find("dl", {"class": "stats"}).find("dd", {"class": "words"}).text.replace(",", ""))
-			global user_word_count
-			user_word_count += word_count
-			# print(word_count)
-
-			# Get kudos
-			kudos = int(w.find("dl", {"class": "stats"}).find("dd", {"class": "kudos"}).find("a").text.replace(",", ""))
-			# print(kudos)
-
-			# Get hits
-			hits = int(w.find("dl", {"class": "stats"}).find("dd", {"class": "hits"}).text.replace(",", ""))
-			# print(hits)
-
 			# Get when user last visited the fic
 			last_visited = w.find("div", {"class": "user module group"}).find("h4").text[15:].split("\n")[0]
 			if last_visited.find(year) == -1:
@@ -148,16 +56,109 @@ def parse_hist_page(soup):
 				is_in_date = False
 			# print(last_visited)
 
-			# Get number of times user visited the fic
-			visitations = w.find("div", {"class": "user module group"}).find("h4").text[15:].split("\n")[4].split("Visited ")[1].split(" ")[0]
-			if(visitations == "once"):
-				visitations = 1
-			else:
-				visitations = int(visitations)
-			# print(visitations)
-
-			# Add this work to the works DataFrame
+			# If user visited the fic in specified year
 			if is_in_date:
+				# Get title
+				title = w.find("div", {"class": "header module"}).find("h4", {"class": "heading"}).find("a").text
+				if title == title.lower():
+					global title_lower_count
+					title_lower_count += 1
+				# print(title)
+
+				# Get authors
+				authors = []
+				for author in w.find("div", {"class": "header module"}).find("h4", {"class": "heading"}).find_all(rel="author"):
+					if author.text != "orphan_account":
+						authors.append(author.text)
+						if author.text in user_authors:
+							user_authors[author.text] += 1
+						else:
+							user_authors[author.text] = 1
+				# print(authors)
+
+				# Get date last updated
+				updated = w.find("div", {"class": "header module"}).find("p").text
+				# print(updated)
+
+				# Get fandoms
+				fandoms = []
+				for fandom in w.find("div", {"class": "header module"}).find("h5", "fandoms heading").find_all("a"):
+					fandoms.append(fandom.text)
+					if fandom.text in user_fandoms:
+						user_fandoms[fandom.text] += 1
+					else:
+						user_fandoms[fandom.text] = 1
+				# print(fandoms)
+
+				# Get relationship type, rating, and work status
+				req_tag_list = []
+				for req_tag in w.find("div", {"class": "header module"}).find("ul").find_all("li"):
+					req_tag_list.append(req_tag.find("a").find("span", {"class": "text"}).text)
+				ship_types = []
+				for type in req_tag_list[2].split(", "):
+					ship_types.append(type)
+					user_ship_type[type] += 1
+				rating = req_tag_list[0]
+				user_rating[rating] += 1
+				work_status = req_tag_list[3]
+				user_status[work_status] += 1
+				# print(ship_types)
+				# print(rating)
+				# print(work_status)
+
+				# Get relationships
+				ships = []
+				for ship in w.find("ul", {"class": "tags commas"}).find_all("li", {"class": "relationships"}):
+					ships.append(ship.text)
+					if ship.text in user_ships:
+						user_ships[ship.text] += 1
+					else:
+						user_ships[ship.text] = 1
+				# print(ships)
+
+				# Get characters
+				characters = []
+				for character in w.find("ul", {"class": "tags commas"}).find_all("li", {"class": "characters"}):
+					characters.append(character.text)
+					if character.text in user_characters:
+						user_characters[character.text] += 1
+					else:
+						user_characters[character.text] = 1
+				# print(characters)
+
+				# Get freeform tags
+				additional_tags = []
+				for tag in w.find("ul", {"class": "tags commas"}).find_all("li", {"class": "freeforms"}):
+					additional_tags.append(tag.text)
+					if tag.text in user_tags:
+						user_tags[tag.text] += 1
+					else:
+						user_tags[tag.text] = 1
+				# print(additional_tags)
+
+				# Get word count
+				word_count = int(w.find("dl", {"class": "stats"}).find("dd", {"class": "words"}).text.replace(",", ""))
+				global user_word_count
+				user_word_count += word_count
+				# print(word_count)
+
+				# Get kudos
+				kudos = int(w.find("dl", {"class": "stats"}).find("dd", {"class": "kudos"}).find("a").text.replace(",", ""))
+				# print(kudos)
+
+				# Get hits
+				hits = int(w.find("dl", {"class": "stats"}).find("dd", {"class": "hits"}).text.replace(",", ""))
+				# print(hits)
+
+				# Get number of times user visited the fic
+				visitations = w.find("div", {"class": "user module group"}).find("h4").text[15:].split("\n")[4].split("Visited ")[1].split(" ")[0]
+				if(visitations == "once"):
+					visitations = 1
+				else:
+					visitations = int(visitations)
+				# print(visitations)
+
+				# Add this work to the works DataFrame
 				global df_works
 				work = {"title": title, "authors": authors, "last_updated": updated, "fandoms": fandoms, "ship_types": ship_types, "rating": rating, "work_status": work_status, "ships": ships, "characters": characters, "additional_tags": additional_tags, "word_count": word_count, "kudos": kudos, "hits": hits, "user_last_visited": last_visited, "user_visitations": visitations}
 				df_works = df_works.append(work, ignore_index=True)
@@ -181,7 +182,8 @@ with requests.Session() as s:
 
 	# Get every fic in a user's history from the year specified and loads them into a DataFrame and updates the user dictionaries
 	while is_in_date:
-		r = s.get("https://archiveofourown.org/users/" + username + "/readings?page=" + str(hist_page))
+		r = s.get("https://archiveofourown.org/users/" + username + "/bookmarks?page=" + str(hist_page))
+		https://archiveofourown.org/users/Echolight/bookmarks?page=1
 		soup = BeautifulSoup(r.content, "html.parser")
 		parse_hist_page(soup)
 		hist_page += 1

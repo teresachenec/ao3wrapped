@@ -9,6 +9,7 @@
 * Check every fic to see if the user left a kudos on it. (4/10) Can then derive kudos rate (2/10).
 * "Popularity" of fics read (5/10)
 * Canonize tags (7/10)
+* Give user option to choose between history and bookmarks (3/10)
 
 # Unsolvable:
 * Counts every time you have ever opened the fic, not just in the specified year

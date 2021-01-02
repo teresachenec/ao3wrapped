@@ -14,7 +14,7 @@ pip install pandas
 ```
 If you're on a macOS then do `pip3` instead of `pip` like `pip3 install requests`.
 
-Then open ao3wrapped.py and the first two lines will have `username` and `password` variables. Enter your ao3 username and password. Save.
+Then open `ao3wrapped.py` and the first two lines will have `username` and `password` variables. Enter your ao3 username and password. Save.
 
 Run the program like this:
 ```
