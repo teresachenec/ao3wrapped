@@ -2,7 +2,6 @@
 * Functionize the printing and we can cut down like who knows a good 70 lines
 * Keeks wanted mpreg fic count. Possibly expand to other "weird" fic categories like RPF and a/b/o.
 * Improve user.csv so that it doesn't export into one giant column
-* Most/least/avg hits/kudos/word count
 * Come up with more insults and print randomly from list
 
 # Additional:

@@ -41,6 +41,23 @@ df_works = df_works.astype({"word_count": "int32", "kudos": "int32", "hits": "in
 if bookmarks:
 	df_works.drop(labels="user_visitations", axis=1, inplace=True)
 
+def get_work_authors(work_index):
+	global df_works
+	work_authors = ""
+	if len(df_works["authors"].iloc[work_index]) == 1:
+		work_authors = df_works["authors"].iloc[work_index][0]
+	elif len(df_works["authors"].iloc[work_index]) == 2:
+		for author in df_works["authors"].iloc[work_index]:
+			work_authors += author + " and "
+		work_authors = work_authors[:-5]
+	elif len(df_works["authors"].iloc[work_index]) >= 3:
+		for author in df_works["authors"].iloc[work_index]:
+			work_authors += author + ", "
+		work_authors = work_authors[:-2]
+	else:
+		work_authors = "Anonymous"
+	return work_authors
+
 # Get authenticity_token token for Rails
 # params:
 # - session: requests Session object
@@ -65,11 +82,9 @@ def parse_hist_page(soup):
 				# Check if work has been deleted
 				if w.find("p", {"class": "message"}) != None:
 					if w.find("p").text == "This has been deleted, sorry!":
-						print("Work has been deleted.")
 						continue
 				# Check if bookmark is a series
 				elif w.find("div", {"class": "own user module group"}).find("ul", {"class": "actions"}).find("li", {"class": "share"}) == None:
-					print("Bookmark is a series.")
 					continue
 
 			# Get when user last visited the fic
@@ -270,19 +285,7 @@ if title_lower_count >= 10:
 
 if not bookmarks:
 	work_index = df_works["user_visitations"].idxmax(axis=1)
-	work_authors = ""
-	if len(df_works["authors"].iloc[work_index]) == 1:
-		work_authors = df_works["authors"].iloc[work_index][0]
-	elif len(df_works["authors"].iloc[work_index]) == 2:
-		for author in df_works["authors"].iloc[work_index]:
-			work_authors += author + " and "
-		work_authors = work_authors[:-5]
-	elif len(df_works["authors"].iloc[work_index]) >= 3:
-		for author in df_works["authors"].iloc[work_index]:
-			work_authors += author + ", "
-		work_authors = work_authors[:-2]
-	else:
-		work_authors = "Anonymous"
+	work_authors = get_work_authors(work_index)
 	print("The fic you've visited the most was %s by %s, with %d visitations." % (df_works["title"].iloc[work_index], work_authors, df_works["user_visitations"].iloc[work_index]))
 
 top_key = list(user_ship_type.keys())[0]
@@ -403,4 +406,33 @@ user_tags_list = list(user_tags)
 for key in user_tags_list[1:5]:
 	print("%d %s fics" % (user_tags[key], key))
 
-print(df_works.describe())
+print("\n")
+
+# Most/least/avg hits/kudos/word count
+work_index = df_works["word_count"].idxmax(axis=1)
+work_authors = get_work_authors(work_index)
+print("Highest word count: %s by %s with %d words" % (df_works["title"].iloc[work_index], work_authors, df_works["word_count"].iloc[work_index]))
+work_index = df_works["word_count"].idxmin(axis=1)
+work_authors = get_work_authors(work_index)
+print("Lowest word count: %s by %s with %d words" % (df_works["title"].iloc[work_index], work_authors, df_works["word_count"].iloc[work_index]))
+print("Average word count: %d" % df_works.describe().at["mean", "word_count"])
+
+print("\n")
+
+work_index = df_works["hits"].idxmax(axis=1)
+work_authors = get_work_authors(work_index)
+print("Most hits: %s by %s with %d hits" % (df_works["title"].iloc[work_index], work_authors, df_works["hits"].iloc[work_index]))
+work_index = df_works["hits"].idxmin(axis=1)
+work_authors = get_work_authors(work_index)
+print("Least hits: %s by %s with %d hits" % (df_works["title"].iloc[work_index], work_authors, df_works["hits"].iloc[work_index]))
+print("Average hits: %d" % df_works.describe().at["mean", "hits"])
+
+print("\n")
+
+work_index = df_works["kudos"].idxmax(axis=1)
+work_authors = get_work_authors(work_index)
+print("Most kudos: %s by %s with %d kudos" % (df_works["title"].iloc[work_index], work_authors, df_works["kudos"].iloc[work_index]))
+work_index = df_works["kudos"].idxmin(axis=1)
+work_authors = get_work_authors(work_index)
+print("Least kudos: %s by %s with %d kudos" % (df_works["title"].iloc[work_index], work_authors, df_works["kudos"].iloc[work_index]))
+print("Average kudos: %d" % df_works.describe().at["mean", "kudos"])
