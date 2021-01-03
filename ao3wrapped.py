@@ -5,6 +5,9 @@ from credentials import uname, pword
 username = uname
 password = pword
 
+# Program defaults on getting its information from the history page, but you can choose to get it from the bookmarks by setting this variable to True
+bookmarks = True
+
 # If you want to run this for another year change this number
 year = "2020"
 
@@ -21,7 +24,7 @@ hist_page = 1
 title_lower_count = 0
 user_ship_type = {"M/M": 0, "F/F": 0, "F/M": 0, "Gen": 0, "Multi": 0, "Other": 0, "No category": 0}
 user_rating = {"General Audiences": 0, "Teen And Up Audiences": 0, "Mature": 0, "Explicit": 0, "Not Rated": 0}
-user_status = {"Complete Work": 0, "Work in Progress": 0, "Unknown": 0}
+user_status = {"Complete Work": 0, "Work in Progress": 0, "Unknown": 0, "Series in Progress": 0}
 user_authors = {}
 user_fandoms = {}
 user_ships = {}
@@ -29,9 +32,14 @@ user_characters = {}
 user_tags = {}
 user_word_count = 0
 dict_list = [user_ship_type, user_rating, user_status, user_authors, user_fandoms, user_ships, user_characters, user_tags]
+scrape_type = "readings"
+if bookmarks:
+	scrape_type = "bookmarks"
 
 df_works = pd.DataFrame(columns=["title", "authors", "last_updated", "fandoms", "ship_types", "rating", "work_status", "ships", "characters", "additional_tags", "word_count", "kudos", "hits", "user_last_visited", "user_visitations"])
 df_works = df_works.astype({"word_count": "int32", "kudos": "int32", "hits": "int32", "user_visitations": "int32"})
+if bookmarks:
+	df_works.drop(labels="user_visitations", axis=1, inplace=True)
 
 # Get authenticity_token token for Rails
 # params:
@@ -46,14 +54,35 @@ def get_token(session):
 # params:
 # - soup: BeautifulSoup object of an ao3 history page
 def parse_hist_page(soup):
-	try:
-		work_list = soup.find("ol", {"class": "reading work index group"})
-		for w in work_list.find_all("li", {"class": "reading work blurb group"}):
+	work_list = ""
+	if bookmarks:
+		work_list = soup.find("ol", {"class": "bookmark index group"}).find_all("li", {"class": "bookmark blurb group"})
+	else:
+		work_list = soup.find("ol", {"class": "reading work index group"}).find_all("li", {"class": "reading work blurb group"})
+	for w in work_list:
+		try:
+			if bookmarks:
+				# Check if work has been deleted
+				if w.find("p", {"class": "message"}) != None:
+					if w.find("p").text == "This has been deleted, sorry!":
+						print("Work has been deleted.")
+						continue
+				# Check if bookmark is a series
+				elif w.find("div", {"class": "own user module group"}).find("ul", {"class": "actions"}).find("li", {"class": "share"}) == None:
+					print("Bookmark is a series.")
+					continue
+
 			# Get when user last visited the fic
-			last_visited = w.find("div", {"class": "user module group"}).find("h4").text[15:].split("\n")[0]
+			last_visited = ""
+			if bookmarks:
+				last_visited = w.find("div", {"class": "own user module group"}).find("p").text
+			else:
+				last_visited = w.find("div", {"class": "user module group"}).find("h4").text[15:].split("\n")[0]
 			if last_visited.find(year) == -1:
 				global is_in_date
 				is_in_date = False
+			else:
+				is_in_date = True
 			# print(last_visited)
 
 			# If user visited the fic in specified year
@@ -151,21 +180,25 @@ def parse_hist_page(soup):
 				# print(hits)
 
 				# Get number of times user visited the fic
-				visitations = w.find("div", {"class": "user module group"}).find("h4").text[15:].split("\n")[4].split("Visited ")[1].split(" ")[0]
-				if(visitations == "once"):
-					visitations = 1
-				else:
-					visitations = int(visitations)
-				# print(visitations)
+				if not bookmarks:
+					visitations = w.find("div", {"class": "user module group"}).find("h4").text[15:].split("\n")[4].split("Visited ")[1].split(" ")[0]
+					if(visitations == "once"):
+						visitations = 1
+					else:
+						visitations = int(visitations)
+					# print(visitations)
 
 				# Add this work to the works DataFrame
 				global df_works
-				work = {"title": title, "authors": authors, "last_updated": updated, "fandoms": fandoms, "ship_types": ship_types, "rating": rating, "work_status": work_status, "ships": ships, "characters": characters, "additional_tags": additional_tags, "word_count": word_count, "kudos": kudos, "hits": hits, "user_last_visited": last_visited, "user_visitations": visitations}
+				work = {"title": title, "authors": authors, "last_updated": updated, "fandoms": fandoms, "ship_types": ship_types, "rating": rating, "work_status": work_status, "ships": ships, "characters": characters, "additional_tags": additional_tags, "word_count": word_count, "kudos": kudos, "hits": hits, "user_last_visited": last_visited}
+				if not bookmarks:
+					work = {"title": title, "authors": authors, "last_updated": updated, "fandoms": fandoms, "ship_types": ship_types, "rating": rating, "work_status": work_status, "ships": ships, "characters": characters, "additional_tags": additional_tags, "word_count": word_count, "kudos": kudos, "hits": hits, "user_last_visited": last_visited, "user_visitations": visitations}
 				df_works = df_works.append(work, ignore_index=True)
 
-	except (RuntimeError, TypeError, NameError, AttributeError):
-		print("Error adding work.")
-		pass
+		except (RuntimeError):
+			print("Error adding work.")
+			# print(w)
+			pass
 
 with requests.Session() as s:
 	token = get_token(s)
@@ -182,9 +215,12 @@ with requests.Session() as s:
 
 	# Get every fic in a user's history from the year specified and loads them into a DataFrame and updates the user dictionaries
 	while is_in_date:
-		r = s.get("https://archiveofourown.org/users/" + username + "/bookmarks?page=" + str(hist_page))
-		https://archiveofourown.org/users/Echolight/bookmarks?page=1
+		r = s.get("https://archiveofourown.org/users/" + username + "/" + scrape_type + "?page=" + str(hist_page))
 		soup = BeautifulSoup(r.content, "html.parser")
+		if soup.find("div", {"class": "flash error"}) != None:
+			if soup.find("div", {"class": "flash error"}).text == "Sorry, you don't have permission to access the page you were trying to reach. Please log in.":
+				print("Error logging in.")
+				exit(1)
 		parse_hist_page(soup)
 		hist_page += 1
 
@@ -232,22 +268,22 @@ elif len(df_works.index) < 50:
 if title_lower_count >= 10:
 	print("%d of those %d fics had all lower-case titles. Hipster." % (title_lower_count, len(df_works.index)))
 
-# have to get index of max
-work_index = df_works["user_visitations"].idxmax(axis=1)
-work_authors = ""
-if len(df_works["authors"].iloc[work_index]) == 1:
-	work_authors = df_works["authors"].iloc[work_index][0]
-elif len(df_works["authors"].iloc[work_index]) == 2:
-	for author in df_works["authors"].iloc[work_index]:
-		work_authors += author + " and "
-	work_authors = work_authors[:-5]
-elif len(df_works["authors"].iloc[work_index]) >= 3:
-	for author in df_works["authors"].iloc[work_index]:
-		work_authors += author + ", "
-	work_authors = work_authors[:-2]
-else:
-	work_authors = "Anonymous"
-print("The fic you've visited the most was %s by %s, with %d visitations." % (df_works["title"].iloc[work_index], work_authors, df_works["user_visitations"].iloc[work_index]))
+if not bookmarks:
+	work_index = df_works["user_visitations"].idxmax(axis=1)
+	work_authors = ""
+	if len(df_works["authors"].iloc[work_index]) == 1:
+		work_authors = df_works["authors"].iloc[work_index][0]
+	elif len(df_works["authors"].iloc[work_index]) == 2:
+		for author in df_works["authors"].iloc[work_index]:
+			work_authors += author + " and "
+		work_authors = work_authors[:-5]
+	elif len(df_works["authors"].iloc[work_index]) >= 3:
+		for author in df_works["authors"].iloc[work_index]:
+			work_authors += author + ", "
+		work_authors = work_authors[:-2]
+	else:
+		work_authors = "Anonymous"
+	print("The fic you've visited the most was %s by %s, with %d visitations." % (df_works["title"].iloc[work_index], work_authors, df_works["user_visitations"].iloc[work_index]))
 
 top_key = list(user_ship_type.keys())[0]
 top_val = user_ship_type[top_key]
@@ -258,7 +294,7 @@ elif top_key == "M/M" or top_key == "F/F":
 	print("Fucking gay.")
 elif top_key == "Gen":
 	print("That's actually really wholesome.")
-print("You also read:")
+print("You also read")
 user_ship_type_list = list(user_ship_type)[1:]
 for key in user_ship_type_list:
 	print("%d %s fics" % (user_ship_type[key], key))
@@ -279,7 +315,7 @@ elif top_key == "Explicit":
 	print("LOLLLL HORNY ASS. DRINK SOME WATER. TAKE A SHOWER. GET LAID MAYBE.")
 elif top_key == "Not Rated":
 	print("I'll be real, you're brave as hell for going into unrated fics. That shit could be ANYTHING.")
-print("You also read:")
+print("You also read")
 user_rating_list = list(user_rating)[1:]
 for key in user_rating_list:
 	print("%d %s fics" % (user_rating[key], key))
@@ -303,7 +339,7 @@ print("You read %d different authors this year." % len(user_authors))
 print("Your most read author this year was %s, with %d fics. You should tell them you're such a big fan, like right now. They deserve to know." % (top_key, top_val))
 print("Seriously. I'll wait. Leave (another) comment on a fic of theirs.")
 # time.sleep(30)
-print("You also read::")
+print("You also read:")
 index = len(user_authors)
 if len(user_authors) >= 5:
 	index = 5
@@ -317,7 +353,7 @@ top_key = list(user_fandoms.keys())[0]
 top_val = user_fandoms[top_key]
 print("You read fics for %d different fandoms this year." % len(user_fandoms))
 print("Your most read fandom was %s, with %d fics this year. Loser." % (top_key, top_val))
-print("You also read::")
+print("You also read:")
 index = len(user_fandoms)
 if len(user_fandoms) >= 5:
 	index = 5
@@ -331,7 +367,7 @@ top_key = list(user_ships.keys())[0]
 top_val = user_ships[top_key]
 print("You read fics with %d different ships this year." % len(user_ships))
 print("Holy shit, how are you not tired of reading about %s? You read %d fics of them this year. Get help." % (top_key, top_val))
-print("You also read::")
+print("You also read:")
 index = len(user_ships)
 if len(user_ships) >= 5:
 	index = 5
@@ -345,7 +381,7 @@ top_key = list(user_characters.keys())[0]
 top_val = user_characters[top_key]
 print("You read about %d different characters this year." % len(user_characters))
 print("What a fucking %s stan. You read %d fics of them this year. You know you're unbearable, right?" % (top_key, top_val))
-print("You also read::")
+print("You also read:")
 index = len(user_characters)
 if len(user_characters) >= 5:
 	index = 5
@@ -359,10 +395,12 @@ top_key = list(user_tags.keys())[0]
 top_val = user_tags[top_key]
 print("You read fics with %d different tags this year, averaging %.2f tags/work." % (len(user_tags), len(user_tags)/len(df_works)))
 print("You're a fucking slut for %s, but you already knew that. You read %d fics with that tag this year. Can't say I'm judging." % (top_key, top_val))
-print("You also read::")
+print("You also read:")
 index = len(user_tags)
 if len(user_tags) >= 5:
 	index = 5
 user_tags_list = list(user_tags)
 for key in user_tags_list[1:5]:
 	print("%d %s fics" % (user_tags[key], key))
+
+print(df_works.describe())
