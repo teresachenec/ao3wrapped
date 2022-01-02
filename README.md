@@ -4,7 +4,7 @@ Y'know how people went "what if there was an ao3 wrapped. That would be so curse
 Check out `todo.md` for what might get updated/what needs to be done. Pull requests are absolutely welcome, as you can tell by looking at this code, I have no idea what I'm doing.
 
 # How To Use
-Clone this repository (green button at the top, `git clone https://github.com/teresachenec/ao3wrapped.git`). Have Python 3.7+ and pip/3 installed. You're on your own for this.
+[Download](https://github.com/teresachenec/ao3wrapped/archive/refs/heads/master.zip) or clone this repository (green button at the top, `git clone https://github.com/teresachenec/ao3wrapped.git`) . Have [Python 3.7+](https://www.python.org/downloads/) and pip/3 installed.
 
 Have the dependencies (listed below) installed. This can be done like this if you're on a Unix machine:
 ```
@@ -14,7 +14,7 @@ pip install pandas
 ```
 If you're on a macOS then do `pip3` instead of `pip` like `pip3 install requests`.
 
-Then open `ao3wrapped.py` and the first two lines will have `username` and `password` variables. Enter your ao3 username and password. Save.
+Then open `ao3wrapped.py` and the first two lines will have `username` and `password` variables. Enter your ao3 username and password. There are options to scrape your history instead of your bookmarks, as well as to change the year. Save your changes.
 
 Run the program like this:
 ```
