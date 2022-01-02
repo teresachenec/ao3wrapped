@@ -5,6 +5,7 @@
 # Additional:
 * "Popularity" of fics read (5/10)
 * Canonize tags (7/10)
+* Matplotlib charts of word count/hits/kudos. This one will hurt because matplotlib hurts me. Not that pandas and bs4 doesn't. (6/10)
 
 # Unsolvable:
 * Counts every time you have ever opened the fic, not just in the specified year
