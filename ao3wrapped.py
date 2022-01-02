@@ -9,7 +9,7 @@ password = pword
 bookmarks = True
 
 # If you want to run this for another year change this number
-year = "2020"
+year = "2021"
 
 # Import statements
 import requests
@@ -266,22 +266,9 @@ with open("user.csv", "w") as f:
 			f.write("%s, %s\n" % (key, dictionary[key]))
 
 # Prints user statistics
-print("LMAO you've read %d fanfics this year, totaling %d words, or %.2f words/day. There's about 70000 words in a novel. You could've read %.2f novels this year, but you read fanfic instead." % (len(df_works.index), user_word_count, user_word_count/365, user_word_count/70000))
-if len(df_works.index) > 1500:
-	print("Oh jeez. The US National Suicide hotline is 800-273-8255. You probably need it.")
-elif len(df_works.index) > 1000:
-	print("Are you proud of yourself? Because I can almost assure you, your parents aren't.")
-elif len(df_works.index) == 666 or len(df_works.index) == 420 or len(df_works.index) == 69:
-	print("Nice.")
-elif len(df_works.index) > 500:
-	print("Think of all that time you've wasted...")
-elif len(df_works.index) < 250:
-	print("C'mon, those are rookie numbers. You can do better next year.")
-elif len(df_works.index) < 50:
-	print("Really? Only", len(df_works.index), "? Why'd you even bother doing this?")
+print("You've read %d fanfics this year, totaling %d words, or %.2f words/day. There's about 70000 words in a novel. You could've read %.2f novels this year, but you read fanfic instead." % (len(df_works.index), user_word_count, user_word_count/365, user_word_count/70000))
 
-if title_lower_count >= 10:
-	print("%d of those %d fics had all lower-case titles. Hipster." % (title_lower_count, len(df_works.index)))
+print("%d of those %d fics had all lower-case titles. Hipster." % (title_lower_count, len(df_works.index)))
 
 if not bookmarks:
 	work_index = df_works["user_visitations"].idxmax(axis=1)
@@ -291,12 +278,6 @@ if not bookmarks:
 top_key = list(user_ship_type.keys())[0]
 top_val = user_ship_type[top_key]
 print("You read %d %s fics this year." % (top_val, top_key))
-if top_key == "F/M":
-	print("Fucking hets.")
-elif top_key == "M/M" or top_key == "F/F":
-	print("Fucking gay.")
-elif top_key == "Gen":
-	print("That's actually really wholesome.")
 print("You also read")
 user_ship_type_list = list(user_ship_type)[1:]
 for key in user_ship_type_list:
@@ -307,17 +288,6 @@ print("\n")
 top_key = list(user_rating.keys())[0]
 top_val = user_rating[top_key]
 print("You read %d %s fics this year." % (top_val, top_key))
-if top_key == "General Audiences":
-	print("Keeping it wholesome, I see. I can respect that.")
-elif top_key == "Teen And Up Audiences":
-	print("Ohhh, did someone read some curse words? Maybe even an action scene? Woooowwwww.")
-elif top_key == "Mature":
-	print("How many of those should have been marked explicit?")
-elif top_key == "Explicit":
-	print("Well, they did say the internet was for porn.")
-	print("LOLLLL HORNY ASS. DRINK SOME WATER. TAKE A SHOWER. GET LAID MAYBE.")
-elif top_key == "Not Rated":
-	print("I'll be real, you're brave as hell for going into unrated fics. That shit could be ANYTHING.")
 print("You also read")
 user_rating_list = list(user_rating)[1:]
 for key in user_rating_list:
@@ -328,11 +298,6 @@ print("\n")
 top_key = list(user_status.keys())[0]
 top_val = user_status[top_key]
 print("You read %d %s and %d %s fics this year." % (top_val, top_key, user_status[list(user_status.keys())[1]], list(user_status.keys())[1]))
-if user_status["Work in Progress"] > user_status["Complete Work"] and user_status["Work in Progress"] > 50:
-	print("You don't know how to filter for complete fics, or you're desperate. Either way, get some help.")
-	print("Impatient are we? You hate having to wait for updates. Well, get used to it, asshole. Time is money and you're making none reading fic.")
-else:
-	pass
 
 print("\n")
 
@@ -355,7 +320,7 @@ print("\n")
 top_key = list(user_fandoms.keys())[0]
 top_val = user_fandoms[top_key]
 print("You read fics for %d different fandoms this year." % len(user_fandoms))
-print("Your most read fandom was %s, with %d fics this year. Loser." % (top_key, top_val))
+print("Your most read fandom was %s, with %d fics this year." % (top_key, top_val))
 print("You also read:")
 index = len(user_fandoms)
 if len(user_fandoms) >= 5:
@@ -369,7 +334,7 @@ print("\n")
 top_key = list(user_ships.keys())[0]
 top_val = user_ships[top_key]
 print("You read fics with %d different ships this year." % len(user_ships))
-print("Holy shit, how are you not tired of reading about %s? You read %d fics of them this year. Get help." % (top_key, top_val))
+print("Are you not tired of reading about %s? You read %d fics of them this year." % (top_key, top_val))
 print("You also read:")
 index = len(user_ships)
 if len(user_ships) >= 5:
@@ -383,7 +348,7 @@ print("\n")
 top_key = list(user_characters.keys())[0]
 top_val = user_characters[top_key]
 print("You read about %d different characters this year." % len(user_characters))
-print("What a fucking %s stan. You read %d fics of them this year. You know you're unbearable, right?" % (top_key, top_val))
+print("What a %s stan. You read %d fics of them this year." % (top_key, top_val))
 print("You also read:")
 index = len(user_characters)
 if len(user_characters) >= 5:
@@ -397,7 +362,7 @@ print("\n")
 top_key = list(user_tags.keys())[0]
 top_val = user_tags[top_key]
 print("You read fics with %d different tags this year, averaging %.2f tags/work." % (len(user_tags), len(user_tags)/len(df_works)))
-print("You're a fucking slut for %s, but you already knew that. You read %d fics with that tag this year. Can't say I'm judging." % (top_key, top_val))
+print("You absolutely love %s, but you already knew that. You read %d fics with that tag this year." % (top_key, top_val))
 print("You also read:")
 index = len(user_tags)
 if len(user_tags) >= 5:
@@ -409,30 +374,30 @@ for key in user_tags_list[1:5]:
 print("\n")
 
 # Most/least/avg hits/kudos/word count
-work_index = df_works["word_count"].idxmax(axis=1)
+work_index = df_works["word_count"].idxmax(axis=0)
 work_authors = get_work_authors(work_index)
 print("Highest word count: %s by %s with %d words" % (df_works["title"].iloc[work_index], work_authors, df_works["word_count"].iloc[work_index]))
-work_index = df_works["word_count"].idxmin(axis=1)
+work_index = df_works["word_count"].idxmin(axis=0)
 work_authors = get_work_authors(work_index)
 print("Lowest word count: %s by %s with %d words" % (df_works["title"].iloc[work_index], work_authors, df_works["word_count"].iloc[work_index]))
 print("Average word count: %d" % df_works.describe().at["mean", "word_count"])
 
 print("\n")
 
-work_index = df_works["hits"].idxmax(axis=1)
+work_index = df_works["hits"].idxmax(axis=0)
 work_authors = get_work_authors(work_index)
 print("Most hits: %s by %s with %d hits" % (df_works["title"].iloc[work_index], work_authors, df_works["hits"].iloc[work_index]))
-work_index = df_works["hits"].idxmin(axis=1)
+work_index = df_works["hits"].idxmin(axis=0)
 work_authors = get_work_authors(work_index)
 print("Least hits: %s by %s with %d hits" % (df_works["title"].iloc[work_index], work_authors, df_works["hits"].iloc[work_index]))
 print("Average hits: %d" % df_works.describe().at["mean", "hits"])
 
 print("\n")
 
-work_index = df_works["kudos"].idxmax(axis=1)
+work_index = df_works["kudos"].idxmax(axis=0)
 work_authors = get_work_authors(work_index)
 print("Most kudos: %s by %s with %d kudos" % (df_works["title"].iloc[work_index], work_authors, df_works["kudos"].iloc[work_index]))
-work_index = df_works["kudos"].idxmin(axis=1)
+work_index = df_works["kudos"].idxmin(axis=0)
 work_authors = get_work_authors(work_index)
 print("Least kudos: %s by %s with %d kudos" % (df_works["title"].iloc[work_index], work_authors, df_works["kudos"].iloc[work_index]))
 print("Average kudos: %d" % df_works.describe().at["mean", "kudos"])
