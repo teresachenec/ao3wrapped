@@ -1,4 +1,4 @@
-from credentials import uname, pword
+# from credentials import uname, pword
 
 # Replace your ao3 username and password and put quotation marks around it
 # Ex: username = "myao3username"
@@ -6,7 +6,7 @@ username = uname
 password = pword
 
 # Program defaults on getting its information from the history page, but you can choose to get it from the bookmarks by setting this variable to True
-bookmarks = True
+bookmarks = False
 
 # If you want to run this for another year change this number
 year = "2021"
@@ -238,6 +238,7 @@ with requests.Session() as s:
 				exit(1)
 		parse_hist_page(soup)
 		hist_page += 1
+		time.sleep(6)
 
 # Stores information collected on works into a csv file
 df_works.to_csv("works.csv")
@@ -306,7 +307,6 @@ top_val = user_authors[top_key]
 print("You read %d different authors this year." % len(user_authors))
 print("Your most read author this year was %s, with %d fics. You should tell them you're such a big fan, like right now. They deserve to know." % (top_key, top_val))
 print("Seriously. I'll wait. Leave (another) comment on a fic of theirs.")
-# time.sleep(30)
 print("You also read:")
 index = len(user_authors)
 if len(user_authors) >= 5:

@@ -3,6 +3,9 @@ Y'know how people went "what if there was an ao3 wrapped. That would be so curse
 
 Check out `todo.md` for what might get updated/what needs to be done. Pull requests are absolutely welcome, as you can tell by looking at this code, I have no idea what I'm doing.
 
+If you run into `AttributeError: 'NoneType' object has no attribute 'find_all'` when running the program, this is likely because ao3 has rate limited you. Fix incoming (or you're welcome to create a PR).
+`
+
 # How To Use
 [Download](https://github.com/teresachenec/ao3wrapped/archive/refs/heads/master.zip) or clone this repository (green button at the top, `git clone https://github.com/teresachenec/ao3wrapped.git`) . Have [Python 3.7+](https://www.python.org/downloads/) and pip/3 installed.
 

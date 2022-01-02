@@ -1,6 +1,7 @@
 # Basic/fixes:
 * Functionize the printing
 * Improve user.csv so that it doesn't export into one giant column
+* Fix when ao3 rate limits
 
 # Additional:
 * "Popularity" of fics read (5/10)
