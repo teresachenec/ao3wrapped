@@ -1,7 +1,7 @@
 # ao3wrapped
 Y'know how people went "what if there was an ao3 wrapped. That would be so cursed. I would hate it." Well.
 
-Check out `todo.md` for what might get updated/what needs to be done.
+Check out `todo.md` for what might get updated/what needs to be done. Pull requests are absolutely welcome, as you can tell by looking at this code, I have no idea what I'm doing.
 
 # How To Use
 Clone this repository (green button at the top, `git clone https://github.com/teresachenec/ao3wrapped.git`). Have Python 3.7+ and pip/3 installed. You're on your own for this.
